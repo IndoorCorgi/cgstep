@@ -279,8 +279,10 @@ class TMC5240:
 
   @global_scaler.setter
   def global_scaler(self, value):
-    if value > 255 or (value < 32 and value != 0):
+    if value > 256 or (value < 32 and value != 0):
       raise ValueError('value out of range')
+    if value == 256:
+      value = 0
     self.set_register_bits(0xB, 7, 0, value)
 
   ##############################################
