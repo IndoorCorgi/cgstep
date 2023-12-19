@@ -17,16 +17,14 @@ m4 = TMC5240(board_id=1, device=1)  # モーター4 (BD_ID ON基板 / J4 MOTOR2�
 # 設定はモーターごとに行う必要がある
 
 # モーター1の設定
-m1.current_range = 0  # 電流基準値
-m1.global_scaler = 128  # 電流倍率
+m1.ifs = 0.5  # モーターの定格に合わせて電流値を設定 (例:0.5A)
 m1.vmax = 68720  # 回転速度
 m1.amax = 500  # 加速
 m1.dmax = 500  # 減速
 m1.enable()  # ドライバーの出力をON
 
 # モーター4の設定
-m4.current_range = 0  # 電流基準値
-m4.global_scaler = 128  # 電流倍率
+m4.ifs = 0.5  # モーターの定格に合わせて電流値を設定 (例:0.5A)
 m4.vmax = 34360  # 回転速度
 m4.amax = 300  # 加速
 m4.dmax = 300  # 減速

@@ -1096,6 +1096,35 @@ class TMC5240:
       time.sleep(polling_interval)
 
   @property
+  def ifs(self):
+    """
+    current_range, global_scalerから電流の最大値[A]を計算して返す
+    """
+    global_scaler = self.global_scaler
+    if global_scaler == 0:
+      global_scaler = 256
+    return round((self.current_range + 1) * global_scaler / 256, 2)
+
+  @ifs.setter
+  def ifs(self, value):
+    """
+    電流の最大値[A]からcurrent_range, global_scalerを計算して設定
+    
+    Args:
+      value: 電流の最大値(IFS) 0.125 - 3.0
+    """
+    if value < 0.125 or value > 3.0:
+      raise ValueError('value out of range')
+    if value <= 1.0:
+      current_range = 0
+    elif value <= 2.0:
+      current_range = 1
+    else:
+      current_range = 2
+    self.current_range = current_range
+    self.global_scaler = round(value * 256 / (current_range + 1))
+
+  @property
   def board_current(self, meas_count=100):
     """
     基板の消費電流[A]を返す
