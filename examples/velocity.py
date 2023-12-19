@@ -13,7 +13,8 @@ m1 = TMC5240()  # モーター制御クラスのインスタンス
 
 # 必ず行う設定
 m1.rampmode = TMC5240.RAMPMODE_VELOCITY_POSITIVE  # 速度指定モードにする.
-m1.current_range = 2  # 電流レンジ
+m1.current_range = 0  # 電流基準値
+m1.global_scaler = 128  # 電流倍率
 m1.vmax = 0  # 回転速度 最初は停止させておくため0にする
 m1.amax = 500  # 加速
 m1.dmax = 500  # 減速

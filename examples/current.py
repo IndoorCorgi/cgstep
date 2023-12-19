@@ -11,15 +11,10 @@ from cgstep import TMC5240
 
 m1 = TMC5240()  # モーター制御クラスのインスタンス
 
-# 電流レンジ
-# 2なら3A, 1なら2A, 0なら1A. (ピーク電流なので3Aの場合実効値は2.1A)
-# 回転時電流irun, 停止時電流iholdの最大値に影響
-m1.current_range = 2
-
-# 電流レンジの微調整
-# global_scalerが0だと無効
-# global_scalerに1-255を設定すると current_rangeで設定した値 x (global_scaler)/256 を電流レンジにする
-m1.global_scaler = 0
+# モーターの定格に合わせて電流値を設定 (例:0.5A)
+# 電流の最大値/相[A] = (current_range + 1) x global_scaler / 256
+m1.current_range = 0  # 基準値を0-2で指定. 0なら1A, 1なら2A, 2なら3A.
+m1.global_scaler = 128  # 上記の値に掛ける倍率を32-256で指定.
 
 m1.irun = 31  # 回転時電流を0-31で指定. 初期値31
 m1.ihold = 31  # 停止時電流を0-31で指定. 初期値8

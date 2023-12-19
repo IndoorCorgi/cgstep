@@ -22,7 +22,8 @@ m1.amax = 500  # 速度がv2〜vmaxの範囲の加速
 m1.dmax = 500  # 速度がv2〜vmaxの範囲の減速
 m1.vmax = 70000  # 回転速度
 
-m1.current_range = 2  # 電流レンジ
+m1.current_range = 0  # 電流基準値
+m1.global_scaler = 128  # 電流倍率
 m1.enable()  # ドライバーの出力をONにしてモーターに電圧印加
 
 m1.xtarget = 256000  # 200ステップ/回転のモーターで5回転
