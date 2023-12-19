@@ -109,6 +109,11 @@ def operation(motor, args):
     motor.disable()
   elif args.command == 'moveto':
     motor.moveto(int(args.write))
+  elif args.command == 'ifs':
+    if args.write is None:
+      print(motor.ifs, '[A]')
+    else:
+      motor.ifs = float(args.write)
   elif args.command == 'board_current':
     print(motor.board_current, '[A]')
   elif args.command == 'supported_param':
