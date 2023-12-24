@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 RPZ-Stepper用サンプルコード
-電流設定, 電流測定
+電流設定, 電流, ドライバーIC温度測定
 Indoor Corgi, https://www.indoorcorgielec.com
 解説ページ: https://www.indoorcorgielec.com/resources/raspberry-pi/rpz-stepper-current/
 """
@@ -38,5 +38,7 @@ m1.irun = 16
 time.sleep(3)
 print('電流(irun=16): {}A'.format(m1.board_current))
 
-# 元の位置に戻す
+print('ドライバーIC温度: {}℃'.format(m1.adc_temp))
+
+# 位置設定モード, 初期位置に戻す
 m1.rampmode = TMC5240.RAMPMODE_POSITIONING
