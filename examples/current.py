@@ -18,7 +18,7 @@ m1.ihold = 31  # 停止時電流を0-31で指定. 初期値8
 m1.tpowerdown = 10  # 停止後irunを保持する時間 = tpowerdown x 21[ms]. 0-255で指定. 初期値10.
 
 # 必ず行う設定
-m1.vmax = 68720  # 回転速度
+m1.vmax_rpm = 60  # 回転速度
 m1.amax = 500  # 加速
 m1.dmax = 500  # 減速
 m1.enable()  # ドライバーの出力をONにしてモーターに電圧印加

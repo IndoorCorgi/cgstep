@@ -14,6 +14,7 @@ def main():
 
   code_path = pathlib.Path(__file__).parent / 'autogen_param_code.py'
   parameters = []
+  conv_param = False
 
   with open(code_path, 'w') as code_file:
     code_file.write(param_header())
@@ -32,7 +33,7 @@ def main():
         if re.search(r'\@property', lines[i]):
           if parameter != '':
             print(parameter)
-            code_file.write(param_code(parameter, read_only, first))
+            code_file.write(param_code(parameter, read_only, first, conv_param))
             code_file.write(comments)
             first = False
           parameter = ''
@@ -41,9 +42,21 @@ def main():
           block_level = 2
         elif re.search(parameter + '.setter', lines[i]) and parameter != '':
           read_only = False
+        elif re.search(r'\# Converted parameters', lines[i]):  # これ以降換算パラメーター
+          # 最後のパラメーターを書き込んでクリア
+          code_file.write(param_code(parameter, read_only, first, conv_param))
+          parameter = ''
+          comments = ''
+          read_only = True
+
+          # コメントを書き込んでconv_paramをセットする
+          code_file.write('\n')
+          code_file.write(lines[i - 1])
+          code_file.write(lines[i])
+          conv_param = True
         elif re.search(r'\# RPZ-Stepper Functions', lines[i]):  # コメント行処理より先に行う
           print(parameter)
-          code_file.write(param_code(parameter, read_only, first))
+          code_file.write(param_code(parameter, read_only, first, conv_param))
           break
         elif re.search(r'^\s*\#', lines[i]):
           comments += lines[i]
@@ -82,7 +95,7 @@ def param_header():
   return code
 
 
-def param_code(parameter, read_only, first=False):
+def param_code(parameter, read_only, first=False, conv_param=False):
   """
   パラメーターparameter処理コードを返す
   
@@ -90,18 +103,27 @@ def param_code(parameter, read_only, first=False):
     parameter: パラメーター名
     read_only: 読み出し専用かどうか
     first: if文の一番最初のパラメーターかどうか
+    conv_param: 小数を扱うパラメーターかどうか
   """
   if first:
     code = "  if args.command=='" + parameter + "':\n"
   else:
     code = "  elif args.command=='" + parameter + "':\n"
+  if conv_param:
+    code += '    motor.steps_per_rev = args.steps_per_rev\n'
   code += '    if args.write is None:\n'
-  code += '      print_val(motor.' + parameter + ', args)\n'
+  if conv_param:
+    code += '      print(motor.' + parameter + ')\n'
+  else:
+    code += '      print_val(motor.' + parameter + ', args)\n'
   code += '    else:\n'
   if read_only:
-    code += "      raise ValueError('{} is not writable parameter'.format(args.command))\n"
+    code += "      raise ValueError('{} is not writable parameter'.format(args.command))\n\n"
   else:
-    code += '      motor.' + parameter + ' = int(args.write, 0)\n\n'
+    if conv_param:
+      code += '      motor.' + parameter + ' = float(args.write)\n\n'
+    else:
+      code += '      motor.' + parameter + ' = int(args.write, 0)\n\n'
   return code
 
 

@@ -16,13 +16,14 @@ class TMC5240:
   RAMPMODE_VELOCITY_NEGATIVE = 2
   RAMPMODE_HOLD = 3
 
-  def __init__(self, bus=0, device=0, board_id=None, spi_speed_hz=1000000):
+  def __init__(self, bus=0, device=0, board_id=None, spi_speed_hz=1000000, steps_per_rev=200):
     """
     Args:
       bus: SPIバス. Raspberry Piでは0. 
       device: CS信号. Raspberry Piでは0か1. 
       board_id: RPZ-Stepper基板用ボード選択信号(GPIO25). 0か1. Noneで使用しない. 
       spi_speed_hz: SPI通信速度[Hz]
+      steps_per_rev: モーター1回転のフルステップ数. 速度計算に使用. 
     """
     self.spi = spidev.SpiDev()
     self.spi.open(bus, device)
@@ -31,6 +32,8 @@ class TMC5240:
     self.signed_position = True
     self.board_id = board_id
     self.board_select_gpio = 25
+    self.steps_per_rev = steps_per_rev
+    self.fclk = 12500000
 
     if board_id is not None:
       if board_id != 0 and board_id != 1:
@@ -1017,7 +1020,6 @@ class TMC5240:
 
   ###################
   # SG4_THRS 0x74
-
   @property
   def sg4_thrs(self):
     return self.get_register_bits(0x74, 7, 0)
@@ -1036,7 +1038,6 @@ class TMC5240:
 
   ###################
   # SG4_RESULT 0x75
-
   @property
   def sg4_result(self):
     return self.get_register_bits(0x75, 9, 0)
@@ -1058,6 +1059,98 @@ class TMC5240:
   @property
   def sg4_ind_3(self):
     return self.get_register_bits(0x76, 31, 24)
+
+  ##############################################
+  # Converted parameters
+
+  @property
+  def ifs(self):
+    """
+    current_range, global_scalerから電流の最大値[A]を計算して返す
+    """
+    global_scaler = self.global_scaler
+    if global_scaler == 0:
+      global_scaler = 256
+    return round((self.current_range + 1) * global_scaler / 256, 2)
+
+  @ifs.setter
+  def ifs(self, value):
+    """
+    電流の最大値[A]からcurrent_range, global_scalerを計算して設定
+    
+    Args:
+      value: 電流の最大値(IFS) 0.125 - 3.0
+    """
+    if value < 0.125 or value > 3.0:
+      raise ValueError('value out of range')
+    if value <= 1.0:
+      current_range = 0
+    elif value <= 2.0:
+      current_range = 1
+    else:
+      current_range = 2
+    self.current_range = current_range
+    self.global_scaler = round(value * 256 / (current_range + 1))
+
+  @property
+  def vactual_rpm(self):
+    return self.v2rpm(self.vactual)
+
+  @property
+  def vmax_rpm(self):
+    return self.v2rpm(self.vmax)
+
+  @vmax_rpm.setter
+  def vmax_rpm(self, value):
+    self.vmax = self.rpm2v(value)
+
+  @property
+  def v1_rpm(self):
+    return self.v2rpm(self.v1)
+
+  @v1_rpm.setter
+  def v1_rpm(self, value):
+    self.v1 = self.rpm2v(value)
+
+  @property
+  def v2_rpm(self):
+    return self.v2rpm(self.v2)
+
+  @v2_rpm.setter
+  def v2_rpm(self, value):
+    self.v2 = self.rpm2v(value)
+
+  @property
+  def tstep_rpm(self):
+    return self.tstep2rpm(self.tstep)
+
+  @property
+  def tpwmthrs_rpm(self):
+    tpwmthrs = self.tpwmthrs
+    if tpwmthrs == 0:
+      return 0
+    return self.tstep2rpm(tpwmthrs)
+
+  @tpwmthrs_rpm.setter
+  def tpwmthrs_rpm(self, value):
+    if value == 0:
+      self.tpwmthrs = 0
+    else:
+      self.tpwmthrs = self.rpm2tstep(value)
+
+  @property
+  def thigh_rpm(self):
+    thigh = self.thigh
+    if thigh == 0:
+      return 0
+    return self.tstep2rpm(thigh)
+
+  @thigh_rpm.setter
+  def thigh_rpm(self, value):
+    if value == 0:
+      self.thigh = 0
+    else:
+      self.thigh = self.rpm2tstep(value)
 
   ##############################################
   # RPZ-Stepper Functions
@@ -1095,34 +1188,29 @@ class TMC5240:
     while self.position_reached == 0:
       time.sleep(polling_interval)
 
-  @property
-  def ifs(self):
+  def rpm2v(self, rpm):
     """
-    current_range, global_scalerから電流の最大値[A]を計算して返す
+    rpmからTMC5240で指定する速度vを計算して返す
     """
-    global_scaler = self.global_scaler
-    if global_scaler == 0:
-      global_scaler = 256
-    return round((self.current_range + 1) * global_scaler / 256, 2)
+    return round(rpm / 60 * self.steps_per_rev * 256 / self.fclk * 2**24)
 
-  @ifs.setter
-  def ifs(self, value):
+  def v2rpm(self, v):
     """
-    電流の最大値[A]からcurrent_range, global_scalerを計算して設定
-    
-    Args:
-      value: 電流の最大値(IFS) 0.125 - 3.0
+    TMC5240で指定する速度vからrpmを計算して返す
     """
-    if value < 0.125 or value > 3.0:
-      raise ValueError('value out of range')
-    if value <= 1.0:
-      current_range = 0
-    elif value <= 2.0:
-      current_range = 1
-    else:
-      current_range = 2
-    self.current_range = current_range
-    self.global_scaler = round(value * 256 / (current_range + 1))
+    return round(v * 60 / self.steps_per_rev / 256 * self.fclk / (2**24), 2)
+
+  def rpm2tstep(self, rpm):
+    """
+    rpmからTMC5240で指定するステップ時間tstepを計算して返す
+    """
+    return round(self.fclk / (rpm / 60 * self.steps_per_rev * 256))
+
+  def tstep2rpm(self, tstep):
+    """
+    TMC5240で指定するステップ時間tstepからrpmを計算して返す
+    """
+    return round(self.fclk / (tstep / 60 * self.steps_per_rev * 256), 2)
 
   @property
   def board_current(self, meas_count=100):
@@ -1157,8 +1245,9 @@ fsactive, cs_actual, stallguard, ot, otpw, s2ga,
 s2gb, ola, olb, stst, pwm_grad, pwm_freq, 
 pwm_autoscale, pwm_autograd, freewheel, pwm_meas_sd_enable, pwm_dis_reg_stst, pwm_reg, 
 pwm_lim, pwm_scale_sum, pwm_scale_auto, pwm_ofs_auto, pwm_grad_auto, sg4_thrs, 
-sg4_filt_en, sg4_result, sg4_ind_0, sg4_ind_1, sg4_ind_2, sg4_ind_3
-"""
+sg4_filt_en, sg4_result, sg4_ind_0, sg4_ind_1, sg4_ind_2, sg4_ind_3, 
+ifs, vactual_rpm, vmax_rpm, v1_rpm, v2_rpm, tstep_rpm, 
+tpwmthrs_rpm, thigh_rpm"""
 
     print(params)
 

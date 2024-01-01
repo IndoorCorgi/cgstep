@@ -25,6 +25,7 @@ def cli():
   parser.add_argument('--board', '-b', type=int, choices=range(0, 2), help='指定した値のBD_IDの基板を選択')
   parser.add_argument('--device', '-d', type=int, choices=range(0, 2), help='指定した値のSPIデバイスを選択')
   parser.add_argument('--hex', '-x', action='store_true', help='結果を16進数で表示')
+  parser.add_argument('--steps-per-rev', '-s', type=int, default=200, help='モーター1回転あたりのフルステップ数')
   args = parser.parse_args()
 
   board_id = None
@@ -109,11 +110,6 @@ def operation(motor, args):
     motor.disable()
   elif args.command == 'moveto':
     motor.moveto(int(args.write))
-  elif args.command == 'ifs':
-    if args.write is None:
-      print(motor.ifs, '[A]')
-    else:
-      motor.ifs = float(args.write)
   elif args.command == 'board_current':
     print(motor.board_current, '[A]')
   elif args.command == 'supported_param':
@@ -848,6 +844,63 @@ def param(motor, args):
       print_val(motor.sg4_ind_3, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
+  ##############################################
+  # Converted parameters
+  elif args.command == 'ifs':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.ifs)
+    else:
+      motor.ifs = float(args.write)
+
+  elif args.command == 'vactual_rpm':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.vactual_rpm)
+    else:
+      raise ValueError('{} is not writable parameter'.format(args.command))
+  elif args.command == 'vmax_rpm':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.vmax_rpm)
+    else:
+      motor.vmax_rpm = float(args.write)
+
+  elif args.command == 'v1_rpm':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.v1_rpm)
+    else:
+      motor.v1_rpm = float(args.write)
+
+  elif args.command == 'v2_rpm':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.v2_rpm)
+    else:
+      motor.v2_rpm = float(args.write)
+
+  elif args.command == 'tstep_rpm':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.tstep_rpm)
+    else:
+      raise ValueError('{} is not writable parameter'.format(args.command))
+  elif args.command == 'tpwmthrs_rpm':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.tpwmthrs_rpm)
+    else:
+      motor.tpwmthrs_rpm = float(args.write)
+
+  elif args.command == 'thigh_rpm':
+    motor.steps_per_rev = args.steps_per_rev
+    if args.write is None:
+      print(motor.thigh_rpm)
+    else:
+      motor.thigh_rpm = float(args.write)
+
   else:
     return False
   return True

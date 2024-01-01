@@ -9,7 +9,7 @@ Indoor Corgi, https://www.indoorcorgielec.com
 import time
 from cgstep import TMC5240
 
-m1 = TMC5240()  # モーター制御クラスのインスタンス
+m1 = TMC5240(steps_per_rev=200)  # モーター制御クラスのインスタンス
 
 # 静音モード有効
 m1.en_pwm_mode = 1
@@ -22,7 +22,7 @@ m1.pwm_freq = 0
 
 # 必ず行う設定
 m1.ifs = 0.5  # モーターの定格に合わせて電流値を設定 (例:0.5A)
-m1.vmax = 80000  # 回転速度
+m1.vmax_rpm = 90  # 回転速度
 m1.amax = 500  # 加速
 m1.dmax = 500  # 減速
 m1.enable()  # ドライバーの出力をONにしてモーターに電圧印加
@@ -32,9 +32,10 @@ time.sleep(5)
 
 # オプション機能
 # tpwmthrsで速度vが一定以上になったら静音モードを解除できる
-# tpwmthrsはtstep単位で指定する. tstep = 16777216 / v
-# 200ステップ/回転のモーターで 60rpmのとき, 速度v=68720, tstep=244
-m1.tpwmthrs = 244
+m1.tpwmthrs_rpm = 60  # 約60rpmを超えると静音モード解除
+
+# tpwmthrsを直接指定する場合は tpwmthrs = 16777216 / v で求める
+# 200ステップ/回転のモーターで 60rpmのとき, 速度v=68720, tpwmthrs=244
 
 m1.xtarget = 0  # 元の位置に戻す
 time.sleep(5)
