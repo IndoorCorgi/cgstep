@@ -1213,7 +1213,7 @@ class TMC5240:
     return round(self.fclk / (tstep / 60 * self.steps_per_rev * 256), 2)
 
   @property
-  def board_current(self, meas_count=100):
+  def board_current(self, meas_count=1000):
     """
     基板の消費電流[A]を返す
     モーター制御中電流は変化しているので, meas_count回測定して平均を計算
