@@ -1274,10 +1274,6 @@ tpwmthrs_rpm, thigh_rpm"""
     for addr in range(0x74, 0x77):
       self.print_register(addr)
 
-  def print_drv_status(self):
-    drvstat = self.read_register(0x6F)
-    print('drv_status: {:#010x}'.format(drvstat))
-
   def print_ramp_settings(self):
     rampmodes = ['POSITIONING', 'VELOCITY POSITIVE', 'VELOCITY NEGATIVE', 'HOLD']
     print('RAMPMODE: {}'.format(rampmodes[self.rampmode]))
