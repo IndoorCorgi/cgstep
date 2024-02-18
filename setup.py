@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='cgstep',
-    version='1.4',
+    version='1.5',
     description='Python package and command line tool to control stepping motor driver RPZ-Stepper/TMC5240 on Raspberry Pi',
     author='Indoor Corgi',
     author_email='indoorcorgi@gmail.com',
