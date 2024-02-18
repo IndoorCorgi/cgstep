@@ -1,6 +1,5 @@
 import time
 import spidev
-import RPi.GPIO as GPIO
 
 
 class TMC5240:
@@ -15,6 +14,9 @@ class TMC5240:
   RAMPMODE_VELOCITY_POSITIVE = 1
   RAMPMODE_VELOCITY_NEGATIVE = 2
   RAMPMODE_HOLD = 3
+
+  BOARD_SELECT_GPIO = 25  # ボード選択GPIO番号
+  board_select_output = None  # ボード選択用DigitalOutputDevice. 切り替え高速化のためクラス変数を利用
 
   def __init__(self, bus=0, device=0, board_id=None, spi_speed_hz=1000000, steps_per_rev=200):
     """
@@ -31,16 +33,12 @@ class TMC5240:
     self.spi.mode = 3
     self.signed_position = True
     self.board_id = board_id
-    self.board_select_gpio = 25
     self.steps_per_rev = steps_per_rev
     self.fclk = 12500000
 
     if board_id is not None:
       if board_id != 0 and board_id != 1:
         raise ValueError('Invalid board_id')
-      GPIO.setwarnings(False)
-      GPIO.setmode(GPIO.BCM)
-      GPIO.setup(self.board_select_gpio, GPIO.OUT)
 
   ##############################################
   # Direct Register Access
@@ -48,16 +46,19 @@ class TMC5240:
   def select_board(self):
     """
     ボード選択信号を出力する
+    board_idがNoneなら何もしない
     board_idが0ならboard_select_gpioをLow
     board_idが1ならboard_select_gpioをHigh
-    board_idがNoneなら何もしない
+    最初の呼び出し時, board_select_outputにインスタンス作成
     """
     if self.board_id is None:
       return
-    if self.board_id == 0:
-      GPIO.output(self.board_select_gpio, 0)
-    elif self.board_id == 1:
-      GPIO.output(self.board_select_gpio, 1)
+
+    from gpiozero import DigitalOutputDevice
+
+    if TMC5240.board_select_output is None:
+      TMC5240.board_select_output = DigitalOutputDevice(self.BOARD_SELECT_GPIO)
+    TMC5240.board_select_output.value = self.board_id
 
   def read_register(self, addr, return_status=False):
     """
