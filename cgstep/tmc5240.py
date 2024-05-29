@@ -137,12 +137,10 @@ class TMC5240:
     """
     return self.get_bits(self.read_register(addr), msb, lsb)
 
-  def set_register_bits(self, addr, msb, lsb, value, pre_read=True):
+  def set_register_bits(self, addr, msb, lsb, value):
     """
     指定レジスターの指定ビットにvalueをセットして書き込む
-
-    Args:
-      pre_read: 一度読み出して, レジスターの未指定ビットは変更前と同じ値を書き込む
+    一度読み出して, レジスターの未指定ビットは変更前と同じ値を書き込む
     """
     data = self.read_register(addr)
     data = self.set_bits(data, msb, lsb, value)
