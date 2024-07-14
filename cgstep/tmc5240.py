@@ -244,6 +244,10 @@ class TMC5240:
   ###################
   # IOIN 0x4
   @property
+  def ext_clk(self):
+    return self.get_register_bits(0x4, 14, 14)
+
+  @property
   def adc_err(self):
     return self.get_register_bits(0x4, 15, 15)
 
@@ -1228,25 +1232,25 @@ class TMC5240:
     サポートしているパラメーター名一覧を表示
     """
     params = """fast_standstill, en_pwm_mode, shaft, stop_enable, direct_mode, reset, 
-drv_err, register_reset, vm_uvlo, adc_err, silicon_rv, version, 
-current_range, slope_control, global_scaler, ihold, irun, iholddelay, 
-irundelay, tpowerdown, tstep, tpwmthrs, tcoolthrs, thigh, 
-rampmode, xactual, vactual, vstart, a1, v1, 
-amax, vmax, dmax, tvmax, d1, vstop, 
-tzerowait, xtarget, direct_a, direct_b, v2, a2, 
-d2, vdcmin, sg_stop, en_softstop, en_virtual_stop_l, en_virtual_stop_r, 
-velocity_reached, position_reached, vzero, virtual_stop_l, virtual_stop_r, adc_ain, 
-adc_vsupply, adc_temp, toff, disfdcc, chm, vhighfs, 
-vhighchm, mres, intpol, diss2g, diss2vs, semin, 
-seup, semax, sedn, seimin, sgt, sfilt, 
-dc_time, dc_sg, sg_result, s2vsa, s2vsb, stealth, 
-fsactive, cs_actual, stallguard, ot, otpw, s2ga, 
-s2gb, ola, olb, stst, pwm_grad, pwm_freq, 
-pwm_autoscale, pwm_autograd, freewheel, pwm_meas_sd_enable, pwm_dis_reg_stst, pwm_reg, 
-pwm_lim, pwm_scale_sum, pwm_scale_auto, pwm_ofs_auto, pwm_grad_auto, sg4_thrs, 
-sg4_filt_en, sg4_result, sg4_ind_0, sg4_ind_1, sg4_ind_2, sg4_ind_3, 
-ifs, vactual_rpm, vmax_rpm, v1_rpm, v2_rpm, tstep_rpm, 
-tpwmthrs_rpm, thigh_rpm"""
+drv_err, register_reset, vm_uvlo, ext_clk, adc_err, silicon_rv, 
+version, current_range, slope_control, global_scaler, ihold, irun, 
+iholddelay, irundelay, tpowerdown, tstep, tpwmthrs, tcoolthrs, 
+thigh, rampmode, xactual, vactual, vstart, a1, 
+v1, amax, vmax, dmax, tvmax, d1, 
+vstop, tzerowait, xtarget, direct_a, direct_b, v2, 
+a2, d2, vdcmin, sg_stop, en_softstop, en_virtual_stop_l, 
+en_virtual_stop_r, velocity_reached, position_reached, vzero, virtual_stop_l, virtual_stop_r, 
+adc_ain, adc_vsupply, adc_temp, toff, disfdcc, chm, 
+vhighfs, vhighchm, mres, intpol, diss2g, diss2vs, 
+semin, seup, semax, sedn, seimin, sgt, 
+sfilt, dc_time, dc_sg, sg_result, s2vsa, s2vsb, 
+stealth, fsactive, cs_actual, stallguard, ot, otpw, 
+s2ga, s2gb, ola, olb, stst, pwm_grad, 
+pwm_freq, pwm_autoscale, pwm_autograd, freewheel, pwm_meas_sd_enable, pwm_dis_reg_stst, 
+pwm_reg, pwm_lim, pwm_scale_sum, pwm_scale_auto, pwm_ofs_auto, pwm_grad_auto, 
+sg4_thrs, sg4_filt_en, sg4_result, sg4_ind_0, sg4_ind_1, sg4_ind_2, 
+sg4_ind_3, ifs, vactual_rpm, vmax_rpm, v1_rpm, v2_rpm, 
+tstep_rpm, tpwmthrs_rpm, thigh_rpm"""
 
     print(params)
 

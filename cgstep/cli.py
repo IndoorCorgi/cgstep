@@ -188,21 +188,30 @@ def param(motor, args):
 
   ###################
   # IOIN 0x4
+  elif args.command == 'ext_clk':
+    if args.write is None:
+      print_val(motor.ext_clk, args)
+    else:
+      raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'adc_err':
     if args.write is None:
       print_val(motor.adc_err, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'silicon_rv':
     if args.write is None:
       print_val(motor.silicon_rv, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'version':
     if args.write is None:
       print_val(motor.version, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # DRV_CONF 0xA
   elif args.command == 'current_range':
@@ -268,6 +277,7 @@ def param(motor, args):
       print_val(motor.tstep, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # TPWMTHRS 0x13
   elif args.command == 'tpwmthrs':
@@ -317,6 +327,7 @@ def param(motor, args):
       print_val(motor.vactual, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # VSTART 0x23
   elif args.command == 'vstart':
@@ -484,16 +495,19 @@ def param(motor, args):
       print_val(motor.velocity_reached, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'position_reached':
     if args.write is None:
       print_val(motor.position_reached, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'vzero':
     if args.write is None:
       print_val(motor.vzero, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # VIRTUAL_STOP_L 0x3E
   elif args.command == 'virtual_stop_l':
@@ -519,11 +533,13 @@ def param(motor, args):
       print_val(motor.adc_ain, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'adc_vsupply':
     if args.write is None:
       print_val(motor.adc_vsupply, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # ADC_TEMP 0x51
   elif args.command == 'adc_temp':
@@ -531,6 +547,7 @@ def param(motor, args):
       print_val(motor.adc_temp, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ##############################################
   # Motor Driver Registers
   ###################
@@ -654,71 +671,85 @@ def param(motor, args):
       print_val(motor.sg_result, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 's2vsa':
     if args.write is None:
       print_val(motor.s2vsa, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 's2vsb':
     if args.write is None:
       print_val(motor.s2vsb, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'stealth':
     if args.write is None:
       print_val(motor.stealth, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'fsactive':
     if args.write is None:
       print_val(motor.fsactive, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'cs_actual':
     if args.write is None:
       print_val(motor.cs_actual, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'stallguard':
     if args.write is None:
       print_val(motor.stallguard, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'ot':
     if args.write is None:
       print_val(motor.ot, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'otpw':
     if args.write is None:
       print_val(motor.otpw, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 's2ga':
     if args.write is None:
       print_val(motor.s2ga, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 's2gb':
     if args.write is None:
       print_val(motor.s2gb, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'ola':
     if args.write is None:
       print_val(motor.ola, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'olb':
     if args.write is None:
       print_val(motor.olb, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'stst':
     if args.write is None:
       print_val(motor.stst, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # PWMCONF 0x70
   elif args.command == 'pwm_grad':
@@ -782,11 +813,13 @@ def param(motor, args):
       print_val(motor.pwm_scale_sum, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'pwm_scale_auto':
     if args.write is None:
       print_val(motor.pwm_scale_auto, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # PWM_AUTO 0x72
   elif args.command == 'pwm_ofs_auto':
@@ -822,6 +855,7 @@ def param(motor, args):
       print_val(motor.sg4_result, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   ###################
   # SG4_IND 0x76
   elif args.command == 'sg4_ind_0':
@@ -829,16 +863,19 @@ def param(motor, args):
       print_val(motor.sg4_ind_0, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'sg4_ind_1':
     if args.write is None:
       print_val(motor.sg4_ind_1, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'sg4_ind_2':
     if args.write is None:
       print_val(motor.sg4_ind_2, args)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'sg4_ind_3':
     if args.write is None:
       print_val(motor.sg4_ind_3, args)
@@ -860,6 +897,7 @@ def param(motor, args):
       print(motor.vactual_rpm)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'vmax_rpm':
     motor.steps_per_rev = args.steps_per_rev
     if args.write is None:
@@ -887,6 +925,7 @@ def param(motor, args):
       print(motor.tstep_rpm)
     else:
       raise ValueError('{} is not writable parameter'.format(args.command))
+
   elif args.command == 'tpwmthrs_rpm':
     motor.steps_per_rev = args.steps_per_rev
     if args.write is None:
